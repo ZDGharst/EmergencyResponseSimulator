@@ -2,6 +2,7 @@
 
 #include "EmergencyVehicle.h"
 
+/* Default constructor. Set id to -1 to represent an unintialized object. */
 EmergencyVehicle::EmergencyVehicle() {
 	id = -1;
 	type = VehicleType::null_type;
@@ -9,6 +10,8 @@ EmergencyVehicle::EmergencyVehicle() {
 	availability = false;
 }
 
+/* Constructor; takes three parameters for ID of vehicle, vehicle type, and zipcode. Assumes the vehicle is
+	automatically available. */
 EmergencyVehicle::EmergencyVehicle(int i, VehicleType t, int z) {
 	id = i;
 	type = t;
@@ -16,6 +19,7 @@ EmergencyVehicle::EmergencyVehicle(int i, VehicleType t, int z) {
 	availability = true;
 }
 
+/* Getters. */
 int EmergencyVehicle::get_id() {
 	return id;
 }
@@ -32,6 +36,7 @@ bool EmergencyVehicle::get_availability() {
 	return availability;
 }
 
+/* Setters. */
 void EmergencyVehicle::change_location(int z) {
 	zipcode = z;
 }

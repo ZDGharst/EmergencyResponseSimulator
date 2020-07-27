@@ -9,7 +9,7 @@ class Request {
 public:
 	Request();
 	Request(int, VehicleType, int);
-	~Request();
+	~Request() {};
 
 	int get_id();
 	VehicleType get_type();

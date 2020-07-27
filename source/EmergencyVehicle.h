@@ -1,5 +1,4 @@
 #pragma once
-#include <vector>
 
 enum class VehicleType {
 	null_type,
@@ -16,7 +15,7 @@ class EmergencyVehicle {
 public:
 	EmergencyVehicle();
 	EmergencyVehicle(int, VehicleType, int);
-	~EmergencyVehicle();
+	~EmergencyVehicle() {}
 
 	int get_id();
 	VehicleType get_type();
