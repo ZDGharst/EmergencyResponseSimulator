@@ -32,7 +32,7 @@ bool EmergencyVehicle::get_availability() {
 	return availability;
 }
 
-int EmergencyVehicle::change_location(int z) {
+void EmergencyVehicle::change_location(int z) {
 	zipcode = z;
 }
 
