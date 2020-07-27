@@ -1,15 +1,19 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-#include "EmergencyVehicle.h"
-#include "Request.h"
 #include <queue>
 #include <time.h>
 #include <string>
 #include <sstream>
 
+
+#include "EmergencyVehicle.h"
+#include "Request.h"
+#include "Distance.h"
+#include "debug.cpp"
+
 /* Function proto-types. */
-void read_zipcodes_csv(int[]);
+void read_zipcodes_csv(int[], Distance[]);
 Request generate_random_request(int[]);
 
 /* Global variables representing primary keys (starting at 1) for vehicles and requests ONLY. */
@@ -17,26 +21,40 @@ int request_primary_key = 1;
 int vehicle_primary_key = 1;
 
 int main() {
-	/* Load zipcodes into an array (representing vertices of a graph). 
-	Load connections between zipcodes into an array (representing edges ofa  graph). */
+	/* Load zipcodes into an array (representing vertices of a graph).
+	Load connections between zipcodes into an array (representing edges of a graph). */
 	int zipcodes[24];
-	read_zipcodes_csv(zipcodes);
+	Distance connections[39];
+	read_zipcodes_csv(zipcodes, connections);
 
-	/* Declare data structures for unfulfilled requests and vehicles in use. */
-	srand(time(NULL));
+	/* Generate 10 of each vehicle type in a random zipcode of our dispatch area. */
 	std::vector<EmergencyVehicle> vehicles;
+	for (int i = 0; i < 10; i++) {
+		int random_zipcode = rand() % 24;
+		vehicles.push_back(EmergencyVehicle(vehicle_primary_key++, VehicleType::ambulance, zipcodes[random_zipcode]));
+	}
+	for (int i = 0; i < 10; i++) {
+		int random_zipcode = rand() % 24;
+		vehicles.push_back(EmergencyVehicle(vehicle_primary_key++, VehicleType::fire_truck, zipcodes[random_zipcode]));
+	}
+	for (int i = 0; i < 10; i++) {
+		int random_zipcode = rand() % 24;
+		vehicles.push_back(EmergencyVehicle(vehicle_primary_key++, VehicleType::police, zipcodes[random_zipcode]));
+	}
+
+	/* Declare data structures for unfulfilled requests. */
 	std::queue<Request> unfulfilled_requests;
 
-	getchar();
-
-
-
-	/* Our control structure. Represents 24 hours; each iteration represents 1 minute. We will simulate a
+	/* Our control structure emulating time. Represents 24 hours; each iteration represents 1 minute. We will simulate a
 	full day (24 * 60 = 1440). */
+	srand(time(NULL));
 	for (int i = 0; i < 1440; i++) {
+		/* Every 10 minutes, generate a new request. */
 		if (i % 10 == 0)
 			unfulfilled_requests.push(generate_random_request(zipcodes));
 
+		/* If there are requests awaiting a vehicle, look for the closest vehicle that matches the type of
+		request that is available. If no vehicles of that type are available, wait for one to become available. */
 		if (!unfulfilled_requests.empty())
 			break;
 	}
@@ -57,24 +75,32 @@ Request generate_random_request(int locations[]) {
 	return random_request;
 }
 
-void read_zipcodes_csv(int zipcodes[]) {
+void read_zipcodes_csv(int zipcodes[], Distance connections[]) {
 	/* Zipcodes csv is formatted as follows:
 	Line 1 is a list of the 24 zipcodes being used. 
 	Line 2 and beyond are formatted as zipcode 1, zipcode 2, and distance between them, separated by commas. */
 	std::ifstream zipcode_csv("zipcodes.csv");
 	if (!zipcode_csv) throw std::runtime_error("Could not open file");
 
-	std::string line, column;
-	int value;
-
 	/* Handle the first line which are the 24 zipcodes used. */
+	std::string line;
 	std::getline(zipcode_csv, line);
 	std::stringstream ss(line);
 
 	for (int i = 0; i < 24; i++) {
 		ss >> zipcodes[i];
-		if(ss.peek() == ',') ss.ignore();
+		ss.ignore();
 	}
 
 	/* Handle all remaining lines treating them as edges in a graph. */
+	for (int i = 0; i < 39; i++) {
+		std::getline(zipcode_csv, line);
+		std::stringstream ss(line);
+
+		ss >> connections[i].zipcode1;
+		ss.ignore();
+		ss >> connections[i].zipcode2;
+		ss.ignore();
+		ss >> connections[i].distance;
+	}
 }
