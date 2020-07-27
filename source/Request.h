@@ -1,5 +1,7 @@
 #pragma once
 
+#include <vector>
+
 #include "EmergencyVehicle.h"
 
 class Request {
@@ -16,5 +18,5 @@ public:
 	int get_location();
 	int get_vehicle_id();
 
-	int assign_vehicle();
+	bool assign_vehicle(std::vector<EmergencyVehicle> &);
 };

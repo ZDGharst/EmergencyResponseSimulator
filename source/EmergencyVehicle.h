@@ -8,9 +8,8 @@ enum class VehicleType {
 };
 
 class EmergencyVehicle {
-	int id, zipcode;
+	int id, zipcode, availability;
 	VehicleType type;
-	bool availability;
 
 public:
 	EmergencyVehicle();
@@ -23,6 +22,7 @@ public:
 	bool get_availability();
 
 	void change_location(int);
-	void set_busy();
+	void set_busy(int);
 	void set_available();
+	void update();
 };

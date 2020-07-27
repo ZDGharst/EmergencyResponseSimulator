@@ -36,7 +36,16 @@ int Request::get_vehicle_id() {
 	return vehicle_id;
 }
 
-/* TODO: Assign vehicle by searching for closest available vehicle. */
-int Request::assign_vehicle() {
-	return 0;
+/* Assign vehicle by searching for closest available vehicle. If it returns true, there was a 
+	vehicle available that was assigned. If false, a vehicle was not available. */
+bool Request::assign_vehicle(std::vector<EmergencyVehicle> &vehicles) {
+	for (int i = 0; i < 30; i++) {
+		if (vehicles[i].get_location() == zipcode && vehicles[i].get_availability() == 0 && vehicles[i].get_type() == type) {
+			vehicle_id = vehicles[i].get_id();
+			vehicles[i].set_busy(10);
+			return true;
+		}
+	}
+
+	return false;
 }

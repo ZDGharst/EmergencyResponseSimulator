@@ -55,10 +55,20 @@ int main() {
 
 		/* If there are requests awaiting a vehicle, look for the closest vehicle that matches the type of
 		request that is available. If no vehicles of that type are available, wait for one to become available. */
-		if (!unfulfilled_requests.empty())
-			break;
-	}
+		if (!unfulfilled_requests.empty()) {
+			if (unfulfilled_requests.front().assign_vehicle(vehicles)) {
+				if (debug::detailed_view) std::cout << i << "Vehicle #" << unfulfilled_requests.front().get_vehicle_id() << " assigned to help request #" << unfulfilled_requests.front().get_id() << '\n';
+				unfulfilled_requests.pop();
+			}
+			else if (debug::detailed_view) std::cout << i << "Attempted to fulfill request #" << unfulfilled_requests.front().get_id() << " but there are no vehicles of that type available!\n";
+		}
 
+		/* Time has incremented by 1, so all busy vehicles must be updated to see if they are now available. */
+		for (int i = 0; i < 30; i++) {
+			vehicles[i].update();
+		}
+	}
+	
 	return 0;
 }
 
@@ -72,6 +82,16 @@ Request generate_random_request(int locations[]) {
 	/* Create the request and return it. Set the primary key of the request and increment it by one for
 	the next request. */
 	Request random_request(request_primary_key++, random_type, locations[random_zipcode]);
+
+	if (debug::detailed_view) {
+		std::cout << "Just got a call: person #" << random_request.get_id() << " at " << random_request.get_location() << " needs ";
+		if (random_request.get_type() == VehicleType::ambulance) std::cout << "an ambulance";
+		else if (random_request.get_type() == VehicleType::fire_truck) std::cout << "a fire truck";
+		else if (random_request.get_type() == VehicleType::police) std::cout << "a police car";
+		else std::cout << "null_type";
+		std::cout << '\n';
+	}
+
 	return random_request;
 }
 

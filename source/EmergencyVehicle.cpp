@@ -7,7 +7,7 @@ EmergencyVehicle::EmergencyVehicle() {
 	id = -1;
 	type = VehicleType::null_type;
 	zipcode = -1;
-	availability = false;
+	availability = -1;
 }
 
 /* Constructor; takes three parameters for ID of vehicle, vehicle type, and zipcode. Assumes the vehicle is
@@ -16,7 +16,7 @@ EmergencyVehicle::EmergencyVehicle(int i, VehicleType t, int z) {
 	id = i;
 	type = t;
 	zipcode = z;
-	availability = true;
+	availability = 0;
 }
 
 /* Getters. */
@@ -41,10 +41,16 @@ void EmergencyVehicle::change_location(int z) {
 	zipcode = z;
 }
 
-void EmergencyVehicle::set_busy() {
-	availability = false;
+/* Availability is an integer that represents how much time until the vehicle is no longer busy. */
+void EmergencyVehicle::set_busy(int i) {
+	availability = i;
 }
 
 void EmergencyVehicle::set_available() {
-	availability = true;
+	availability = 0;
+}
+
+/* Update vehicle time every minute. */
+void EmergencyVehicle::update() {
+	if (availability > 0) --availability;
 }
