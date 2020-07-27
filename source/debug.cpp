@@ -20,7 +20,8 @@ namespace debug {
 			std::cout << zipcodes[i] << '\n';
 	}
 }
-//
+
+
 ///* Create adjacency list. */
 //for (int i = 0; i < 39; i++) {
 //	if (connections[i].zipcode1 == u || connections[i].zipcode2 == u) {

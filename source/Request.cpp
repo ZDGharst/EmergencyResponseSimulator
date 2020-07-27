@@ -60,9 +60,13 @@ bool Request::assign_vehicle(std::vector<EmergencyVehicle> &vehicles, int zipcod
 	Q.push(std::make_pair(0, zipcode));
 	dist[zipcode] = 0;
 
+	/* For each node closest to the source... */
 	while (!Q.empty()) {
 		int u = Q.top().second;
-
+		
+		/* Iterate across the vehicles to see if any are in the node we are currently visiting. If it is, 
+		check if its available and if it is of the right type. If so, set the vehicle to busy and change
+		its location. Return true to signify we found the closest vehicle. */
 		for (int i = 0; i < 30; i++) {
 			if (vehicles[i].get_location() == u && vehicles[i].get_availability() == 0 && vehicles[i].get_type() == type) {
 				vehicle_id = vehicles[i].get_id();
@@ -72,17 +76,21 @@ bool Request::assign_vehicle(std::vector<EmergencyVehicle> &vehicles, int zipcod
 			}
 		}
 
+		/* If there are no vehicles in the node u, remove it from the Q, then look at the next closest zipcode to the request. */
 		Q.pop();
 
-		/* Create adjacency list. */
+		/* Find the adjacent nodes to u, then calculate if they have a new closest distance to source. */
 		for (int i = 0; i < 39; i++) {
 			if (connections[i].zipcode1 == u || connections[i].zipcode2 == u) {
 				Distance v = connections[i];
+
+				/* Re-arrange the zipcodes so that u is always zipcode 1. */
 				if (v.zipcode1 != u) {
 					v.zipcode2 = v.zipcode1;
 					v.zipcode1 = u;
 				}
 
+				/* Change the distance is a closer one is found. */
 				if (dist[v.zipcode2] > dist[v.zipcode1] + v.distance) {
 					dist[v.zipcode2] = dist[v.zipcode1] + v.distance;
 					Q.push(std::make_pair(dist[v.zipcode2], v.zipcode2));
@@ -90,11 +98,12 @@ bool Request::assign_vehicle(std::vector<EmergencyVehicle> &vehicles, int zipcod
 			}
 		}
 	}
-	getchar();
 
+	/* All vehicles of that type must be busy so return false. */
 	return false;
 }
 
+/* Overload the << operator so that the information within the object will be output. */
 std::ostream& operator<<(std::ostream& os, const Request &r) {
 	os << std::setw(4) << r.id << ' '
 		<< std::setw(7) << r.zipcode << ' '	<< std::setw(12);
