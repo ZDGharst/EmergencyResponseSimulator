@@ -19,7 +19,7 @@ public:
 	int get_id();
 	VehicleType get_type();
 	int get_location();
-	bool get_availability();
+	int get_availability();
 
 	void change_location(int);
 	void set_busy(int);

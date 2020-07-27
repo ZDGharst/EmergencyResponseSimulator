@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include "EmergencyVehicle.h"
 
 /* Default constructor. Set id to -1 to represent an unintialized object. */
@@ -32,7 +33,7 @@ int EmergencyVehicle::get_location() {
 	return zipcode;
 }
 
-bool EmergencyVehicle::get_availability() {
+int EmergencyVehicle::get_availability() {
 	return availability;
 }
 

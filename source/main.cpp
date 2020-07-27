@@ -27,6 +27,7 @@ int main() {
 	Distance connections[39];
 	read_zipcodes_csv(zipcodes, connections);
 
+
 	/* Generate 10 of each vehicle type in a random zipcode of our dispatch area. */
 	std::vector<EmergencyVehicle> vehicles;
 	for (int i = 0; i < 10; i++) {
@@ -44,6 +45,7 @@ int main() {
 
 	/* Declare data structures for unfulfilled requests. */
 	std::queue<Request> unfulfilled_requests;
+	std::vector<Request> fulfilled_requests;
 
 	/* Our control structure emulating time. Represents 24 hours; each iteration represents 1 minute. We will simulate a
 	full day (24 * 60 = 1440). */
@@ -56,11 +58,12 @@ int main() {
 		/* If there are requests awaiting a vehicle, look for the closest vehicle that matches the type of
 		request that is available. If no vehicles of that type are available, wait for one to become available. */
 		if (!unfulfilled_requests.empty()) {
-			if (unfulfilled_requests.front().assign_vehicle(vehicles)) {
-				if (debug::detailed_view) std::cout << i << "Vehicle #" << unfulfilled_requests.front().get_vehicle_id() << " assigned to help request #" << unfulfilled_requests.front().get_id() << '\n';
+			if (unfulfilled_requests.front().assign_vehicle(vehicles, zipcodes, connections)) {
+				if (debug::detailed_view) std::cout << "Vehicle #" << unfulfilled_requests.front().get_vehicle_id() << " assigned to help request #" << unfulfilled_requests.front().get_id() << "with an estimated arrival time of " << vehicles[unfulfilled_requests.front().get_vehicle_id() - 1].get_availability() << '\n';
+				fulfilled_requests.push_back(unfulfilled_requests.front());
 				unfulfilled_requests.pop();
 			}
-			else if (debug::detailed_view) std::cout << i << "Attempted to fulfill request #" << unfulfilled_requests.front().get_id() << " but there are no vehicles of that type available!\n";
+			else if (debug::detailed_view) std::cout << "Attempted to fulfill request #" << unfulfilled_requests.front().get_id() << " but there are no vehicles of that type available!\n";
 		}
 
 		/* Time has incremented by 1, so all busy vehicles must be updated to see if they are now available. */
@@ -68,7 +71,12 @@ int main() {
 			vehicles[i].update();
 		}
 	}
-	
+
+	std::cout << "  ID  Zipcode     Type     VID\n";
+	for (int i = 0; i < fulfilled_requests.size(); i++) {
+		std::cout << fulfilled_requests[i];
+	}
+
 	return 0;
 }
 
@@ -124,3 +132,4 @@ void read_zipcodes_csv(int zipcodes[], Distance connections[]) {
 		ss >> connections[i].distance;
 	}
 }
+
