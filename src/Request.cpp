@@ -1,5 +1,3 @@
-#pragma once
-
 #include <iostream>
 #include <iomanip>
 #include <unordered_map>
@@ -47,13 +45,11 @@ int Request::get_vehicle_id() {
 	vehicle available that was assigned. If false, a vehicle was not available. */
 bool Request::assign_vehicle(std::vector<EmergencyVehicle> &vehicles, int zipcodes[], Distance connections[]) {
 	std::unordered_map<int, int> dist;
-	std::unordered_map<int, int> prev;
 	std::priority_queue<std::pair<int, int>, std::vector<std::pair<int, int>>, std::greater<std::pair<int, int>>> Q;
 	
-	/* For all zipcodes, set distance to infinity and previous to null. */
+	/* For all zipcodes, set distance to an arbitrarily large number. */
 	for (int i = 0; i < 24; i++) {
-		dist[zipcodes[i]] = INT_MAX;
-		prev[zipcodes[i]] = NULL;
+		dist[zipcodes[i]] = 100000;
 	}
 
 	/* Set distance to request (source) to 0 and add it to queue. */

@@ -1,19 +1,18 @@
 #include <iostream>
-#include <fstream>
 #include <vector>
 #include <queue>
 #include <time.h>
-#include <string>
+#include <fstream>
 #include <sstream>
+#include <string>
 
 #include "EmergencyVehicle.h"
 #include "Request.h"
 #include "Distance.h"
-#include "debug.cpp"
-#include "generate_graph.cpp"
 
 /* Function proto-types. */
 Request generate_random_request(int[]);
+void read_zipcodes_csv(int zipcodes[], Distance connections[]);
 
 /* Global variables representing primary keys (starting at 1) for vehicles and requests ONLY. */
 int request_primary_key = 1;
@@ -58,12 +57,10 @@ int main() {
 		to become available. */
 		if (!unfulfilled_requests.empty()) {
 			if (unfulfilled_requests.front().assign_vehicle(vehicles, zipcodes, connections)) {
-				if (debug::detailed_view) std::cout << "Vehicle #" << unfulfilled_requests.front().get_vehicle_id() << " assigned to help request #" << unfulfilled_requests.front().get_id() << "with an estimated arrival time of " << vehicles[unfulfilled_requests.front().get_vehicle_id() - 1].get_availability() << '\n';
 
 				fulfilled_requests.push_back(unfulfilled_requests.front());
 				unfulfilled_requests.pop();
 			}
-			else if (debug::detailed_view) std::cout << "Attempted to fulfill request #" << unfulfilled_requests.front().get_id() << " but there are no vehicles of that type available!\n";
 		}
 
 		/* Time has incremented by 1, so all busy vehicles must be updated to see if they are no longer busy. */
@@ -92,15 +89,35 @@ Request generate_random_request(int locations[]) {
 	the next request. */
 	Request random_request(request_primary_key++, random_type, locations[random_zipcode]);
 
-	/* Detailed output. */
-	if (debug::detailed_view) {
-		std::cout << "Just got a call: person #" << random_request.get_id() << " at " << random_request.get_location() << " needs ";
-		if (random_request.get_type() == VehicleType::ambulance) std::cout << "an ambulance";
-		else if (random_request.get_type() == VehicleType::fire_truck) std::cout << "a fire truck";
-		else if (random_request.get_type() == VehicleType::police) std::cout << "a police car";
-		else std::cout << "null_type";
-		std::cout << '\n';
+	return random_request;
+}
+
+void read_zipcodes_csv(int zipcodes[], Distance connections[]) {
+	/* Zipcodes csv is formatted as follows:
+	Line 1 is a list of the 24 zipcodes being used.
+	Line 2 and beyond are formatted as zipcode 1, zipcode 2, and distance between them, separated by commas. */
+	std::ifstream zipcode_csv("data/zipcodes.csv");
+	if (!zipcode_csv) throw std::runtime_error("Could not open file");
+
+	/* Handle the first line which are the 24 zipcodes used. */
+	std::string line;
+	std::getline(zipcode_csv, line);
+	std::stringstream ss(line);
+
+	for (int i = 0; i < 24; i++) {
+		ss >> zipcodes[i];
+		ss.ignore();
 	}
 
-	return random_request;
+	/* Handle all remaining lines treating them as edges in a graph. */
+	for (int i = 0; i < 39; i++) {
+		std::getline(zipcode_csv, line);
+		std::stringstream ss(line);
+
+		ss >> connections[i].zipcode1;
+		ss.ignore();
+		ss >> connections[i].zipcode2;
+		ss.ignore();
+		ss >> connections[i].distance;
+	}
 }
