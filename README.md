@@ -40,6 +40,7 @@ The vast majority of the functions in the program are getters, setters, and rand
 
 ## Output
 
+![Output](docs/output.png)  
 The output of the program are the fulfilled requests and which vehicle completed them.
 
 ## Further Questions & Future
